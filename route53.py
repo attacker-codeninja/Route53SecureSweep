@@ -13,9 +13,11 @@ def fetch_route53_data():
         # Retrieve the list of hosted zones
         route53_paginator = route53.get_paginator('list_hosted_zones')
         route53_zone_loop = route53_paginator.paginate()
+        zones_found = False
         for page in route53_zone_loop:
             aws_zone = page["HostedZones"]
             for zone in aws_zone:
+                zones_found = True
                 zone_type = zone["Config"]['PrivateZone']
                 if not zone_type:  # Public Zone
                     try:
@@ -27,13 +29,19 @@ def fetch_route53_data():
                                 # Save Route53 subdomains
                                 with open("route53_results/route53_subdomains.txt", "a") as route53_subdomains:
                                     route53_subdomains.write(f'{sub["Name"]}\n')
-                                    # Sort route53 results
-                                    os.system("sort -u route53_results/route53_subdomains.txt > route53_results/sorted_route53_subdomains.txt")
-
+                        # Sort route53 results
+                        os.system("sort -u route53_results/route53_subdomains.txt > route53_results/sorted_route53_subdomains.txt")
                     except Exception as error:
                         with open("error/r53_error_log.txt", "a") as error_log:
                             error_log.write(str(error))
                         raise error
+        if not zones_found:
+            print("No zones found in the AWS account")
+            with open("error/r53_error_log.txt", "a") as error_log:
+                error_log.write("No zones found in the AWS account")
+            with open("route53_results/sorted_route53_subdomains.txt", "w") as route53_subdomains:
+                # Create an empty file
+                pass  
 
         # Call resolve_dns_records function
         resolve_dns_records("route53_results/sorted_route53_subdomains.txt")
