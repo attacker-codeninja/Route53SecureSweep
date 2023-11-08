@@ -7,6 +7,7 @@ import subprocess
 # Set the URL and directory for nuclei templates repository
 TEMPLATES_REPO_URL = "https://github.com/projectdiscovery/nuclei-templates.git"
 TEMPLATES_REPO_DIR = "nuclei-templates"
+nxdomains_file = 'route53_results/sorted_nxdomains.txt'
 
 # Function to check if Go is installed and working
 def check_go_installed():
@@ -187,13 +188,19 @@ def process_assets():
         subprocess.run("echo '------------------------------------------------------------------------------------------------------' | notify -silent -provider-config provider-config.yaml", shell=True)
 
         # Notify about total NxDomains
+        #file is part of exception, is created in case of nxdomain exception
         subprocess.run("echo '---------------------------Total Nxdomains--------------------------------------------------------' | notify -silent -provider-config provider-config.yaml", shell=True)
 
-        # Notify about total NxDomains
-        subprocess.run("echo 'Number of NxDomains Detected in AWS Account '; wc -l < route53_results/sorted_nxdomains.txt | awk '{$1=$1};1' | notify -silent -provider-config provider-config.yaml", shell=True)
-
-        # Notify about sorted NxDomains
-        subprocess.run("cat route53_results/sorted_nxdomains.txt | notify -silent -bulk -provider-config provider-config.yaml", shell=True)
+        if os.path.exists(nxdomains_file):
+                # Notify about total NxDomains if file exists
+            subprocess.run(f"echo 'Number of NxDomains Detected in AWS Account '; wc -l < {nxdomains_file} | awk '{{print $1}}' | notify -silent -provider-config provider-config.yaml", shell=True)
+            subprocess.run(f"cat {nxdomains_file} | notify -silent -bulk -provider-config provider-config.yaml", shell=True)
+        else:
+            # If the file does not exist, pass word count as 0
+            subprocess.run("echo 'Number of NxDomains Detected in AWS Account 0' | notify -silent -provider-config provider-config.yaml", shell=True)
+        # If the file does not exist, ignore the cat command
+        # You can optionally notify that the file was not found if needed
+        # subprocess.run("echo 'sorted_nxdomains.txt file not found.' | notify -silent -provider-config provider-config.yaml", shell=True)
 
         # Notify separator line
         subprocess.run("echo '-----------------------------------------------------------------------------------------------------' | notify -silent -provider-config provider-config.yaml", shell=True)
@@ -220,6 +227,7 @@ def run_nuclei_full_scan():
         subprocess.run("echo '------------------------Starting Nuclei Full Scan-------------------------------------------------' | notify -silent -provider-config provider-config.yaml", shell=True)
 
         # Perform Nuclei full scan
+        #currently set to http in template to reduce the time, in reality run_nuclei_aws_scan scans only for http however full scan uses all the templates including http
         subprocess.run("cat results/subdomain_fulldb.txt | httpx -silent | nuclei -t nuclei-templates/http/ -silent -o results/subdomain_fullscan.txt", shell=True)
 
         # Notify about subdomain full scan
@@ -241,10 +249,10 @@ def run_nuclei_aws_scan():
         subprocess.run("echo '------------------------Starting Nuclei AWS Public Endpoint Scan-------------------------------------------------' | notify -silent -provider-config provider-config.yaml", shell=True)
 
         # Perform Nuclei full scan
-        subprocess.run("cat results/subdomain_fulldb_sorted.txt | httpx -silent | nuclei -t nuclei-templates/http/ -silent -o results/aws_services_fulldb_scan.txt", shell=True)
+        subprocess.run("cat results/subdomain_fulldb.txt | httpx -silent | nuclei -t nuclei-templates/http/ -silent -o results/aws_services_fulldb_scan.txt", shell=True)
 
         # Notify about subdomain full scan
-        subprocess.run("cat results/aws_services_fulldb_scan.tx | notify -silent -bulk -provider-config provider-config.yaml", shell=True)
+        subprocess.run("cat results/aws_services_fulldb_scan.txt | notify -silent -bulk -provider-config provider-config.yaml", shell=True)
 
         # Notify separator line
         subprocess.run("echo '-----------------------------------------------------------------------------------------------------' | notify -silent -provider-config provider-config.yaml", shell=True)
