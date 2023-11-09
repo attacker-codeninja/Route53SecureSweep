@@ -72,6 +72,7 @@ def resolve_dns_records(subdomain_file):
             # Sort NXDOMAIN subdomains
             os.system("sort -u route53_results/unsorted_nxdomains.txt > route53_results/sorted_nxdomains.txt")
 
+
         except dns.resolver.NoAnswer:
             # Save NoAnswer subdomains
             with open("route53_results/unsorted_noanswer_subdomains.txt", "a") as no_dns_subdomains:
