@@ -44,12 +44,16 @@ python3 -m pip install -r requirements.txt
 
 ### Ensure that the following tools are installed and working on your system:
 
-    - Go: Verify the installation of Go by running go version in the terminal.
-    
-    - Nuclei: Check if Nuclei is installed and working by running nuclei -version.
-    - Anew: Verify Anew installation with anew -h.
-    - Notify: Ensure Notify is installed with notify -version.
-    - Httpx: Confirm that Httpx is installed by running httpx -version.
+- Go: Verify the installation of Go by running go version in the terminal.
+    ```
+      export GOPATH=$HOME/go
+      export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
+    ```
+
+- Nuclei: Check if Nuclei is installed and working by running nuclei -version.
+- Anew: Verify Anew installation with anew -h.
+- Notify: Ensure Notify is installed with notify -version.
+- Httpx: Confirm that Httpx is installed by running httpx -version.
 
 - These tools are essential for the Route53 Scan Sweep to function correctly. If any of these are not installed, please install them according to their respective documentation.
 
