@@ -1,5 +1,7 @@
 # Route53SecureSweep
 
+![Alt text](rsweep-logo.png "Optional title")
+
 
 ## Route53 Scan Sweep Tool Documentation
 
