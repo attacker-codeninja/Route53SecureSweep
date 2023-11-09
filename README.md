@@ -1,4 +1,4 @@
-# Route53SecureSweep# Route53SecureSweep
+# Route53SecureSweep
 
 
 ## Prerequisite
