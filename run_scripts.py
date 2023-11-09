@@ -15,16 +15,21 @@ current_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
 
 
-
 # Directory path
 dir_path = 'final_results'
 
-# Check if the directory is empty
-if os.listdir(dir_path):
-    # If the directory is not empty, delete it and recreate it
-    shutil.rmtree(dir_path)
-    subprocess.run(f"mkdir -p {dir_path}", shell=True)
 
+# Check if the directory exists
+if not os.path.exists(dir_path):
+    # If the directory does not exist, create it using mkdir
+    os.makedirs(dir_path)
+else:
+    # If the directory exists, check if it is empty
+    if os.listdir(dir_path):
+        # If the directory is not empty, delete it and recreate it
+        shutil.rmtree(dir_path)
+        os.makedirs(dir_path)
+        
 # Function to check if Go is installed and working
 def check_go_installed():
     try:
