@@ -46,10 +46,6 @@ python3 -m pip install -r requirements.txt
 
     - Go: Verify the installation of Go by running go version in the terminal.
     
-    ```
-      export GOPATH=$HOME/go
-      export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
-    ```
     - Nuclei: Check if Nuclei is installed and working by running nuclei -version.
     - Anew: Verify Anew installation with anew -h.
     - Notify: Ensure Notify is installed with notify -version.
