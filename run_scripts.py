@@ -3,11 +3,27 @@ import shutil
 from tqdm import tqdm
 from route53 import fetch_route53_data, remove_unsorted_files
 import subprocess
+from datetime import datetime
 
 # Set the URL and directory for nuclei templates repository
 TEMPLATES_REPO_URL = "https://github.com/projectdiscovery/nuclei-templates.git"
 TEMPLATES_REPO_DIR = "nuclei-templates"
 nxdomains_file = 'route53_results/sorted_nxdomains.txt'
+# Get the current date
+current_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+
+
+
+
+# Directory path
+dir_path = 'final_results'
+
+# Check if the directory is empty
+if os.listdir(dir_path):
+    # If the directory is not empty, delete it and recreate it
+    shutil.rmtree(dir_path)
+    subprocess.run(f"mkdir -p {dir_path}", shell=True)
 
 # Function to check if Go is installed and working
 def check_go_installed():
@@ -141,8 +157,10 @@ def run_additional_scripts():
 # Function to run Nuclei subdomain check
 def run_nuclei_subdomain_check():
     try:
-        run_nuclei_scan = "cat route53_results/sorted_route53_subdomains.txt | httpx -silent | nuclei -t nuclei-templates/http/takeovers -silent -o results/subdomain_takeover.txt"
+        run_nuclei_scan = "cat route53_results/sorted_route53_subdomains.txt | httpx -silent | nuclei -t nuclei-templates/http/takeovers -silent -o final_results/subdomain_takeover.txt"
         os.system(run_nuclei_scan)
+        subprocess.run("cat route53_results/sorted_route53_subdomains.txt | httpx -silent > final_results/route53_subdomains.txt", shell=True, capture_output=True, text=True)
+
     except Exception as error:
         with open("error/r53_error_log.txt", "a") as error_log:
             error_log.write(str(error))
@@ -155,8 +173,11 @@ def run_nuclei_subdomain_check():
 # Function to process the assets and notify
 def process_assets():
     try:
+        # Notify with the current date
+        subprocess.run(f"echo 'Date: {current_date}' | notify -silent -provider-config provider-config.yaml", shell=True)
+        
         # Concatenate files and redirect output to subdomain_fulldb.txt
-        subprocess.run("cat results/accelerator_ips.txt results/cf_domains.txt results/eb_domain.txt results/public_eips.txt results/public_ips.txt results/neptune_endpoints.txt results/public_ips.txt results/rds_domains.txt results/elasticsearch_endpoints.txt results/redshift_endpoints.txt results/http_apis.txt results/rest_apis.txt results/lightsail_ips.txt results/stale_eip.txt results/lb_domains.txt results/websocket_apis.txt | anew results/subdomain_data.txt > results/subdomain_fulldb_sorted.txt && sort -u results/subdomain_fulldb_sorted.txt > results/subdomain_fulldb.txt && rm results/subdomain_fulldb_sorted.txt", shell=True)
+        subprocess.run("cat results/accelerator_ips.txt results/cf_domains.txt results/eb_domain.txt results/public_eips.txt results/public_ips.txt results/neptune_endpoints.txt results/public_ips.txt results/rds_domains.txt results/elasticsearch_endpoints.txt results/redshift_endpoints.txt results/http_apis.txt results/rest_apis.txt results/lightsail_ips.txt results/stale_eip.txt results/lb_domains.txt results/websocket_apis.txt route53_results/sorted_route53_subdomains.txt | anew subdomain_data.txt > results/subdomain_fulldb_sorted.txt && sort -u results/subdomain_fulldb_sorted.txt > final_results/subdomain_fulldb.txt", shell=True)
 
         # Notify separator line
         subprocess.run("echo '-------------Daily Route53 Scan Initiated--------------------------------------------------' | notify -silent -provider-config provider-config.yaml", shell=True)
@@ -165,10 +186,10 @@ def process_assets():
         subprocess.run("echo '------------------------Total Number of New AWS Assets Discovered:----------------------------------------------------' | notify -silent -provider-config provider-config.yaml", shell=True, capture_output=True, text=True)
 
         # Notify about total number of new assets discovered
-        subprocess.run("echo 'Number of newly discovered assets in the AWS account today: '; wc -l < results/subdomain_fulldb.txt | awk '{$1=$1};1' | notify -silent -provider-config provider-config.yaml", shell=True)
+        subprocess.run("echo 'Number of newly discovered assets in the AWS account today: '; wc -l < final_results/subdomain_fulldb.txt | awk '{$1=$1};1' | notify -silent -provider-config provider-config.yaml", shell=True)
 
         # Notify about subdomain data
-        subprocess.run("cat results/subdomain_fulldb.txt | notify -silent -bulk -provider-config provider-config.yaml", shell=True)
+        subprocess.run("cat final_results/subdomain_fulldb.txt | notify -silent -bulk -provider-config provider-config.yaml", shell=True)
 
         # Notify separator line
         subprocess.run("echo '------------------------------------------------------------------------------------------------------' | notify -silent -provider-config provider-config.yaml", shell=True)
@@ -178,10 +199,10 @@ def process_assets():
         subprocess.run("echo '-----------------------------Total Subdomain Takeovers-------------------------------------------------' | notify -silent -provider-config provider-config.yaml", shell=True)
 
         # Notify about total Subdomain takeovers
-        subprocess.run("echo 'Number of Subdomain Takeovers Detected in AWS Account: '; wc -l < results/subdomain_takeover.txt | awk '{$1=$1};1' | notify -silent -provider-config provider-config.yaml", shell=True)
+        subprocess.run("echo 'Number of Subdomain Takeovers Detected in AWS Account: '; wc -l < final_results/subdomain_takeover.txt | awk '{$1=$1};1' | notify -silent -provider-config provider-config.yaml", shell=True)
 
         # Notify about subdomain takeover data
-        subprocess.run("cat results/subdomain_takeover.txt | notify -silent -bulk -provider-config provider-config.yaml", shell=True)
+        subprocess.run("cat final_results/subdomain_takeover.txt | notify -silent -bulk -provider-config provider-config.yaml", shell=True)
 
         # Notify separator line
         subprocess.run("echo '------------------------------------------------------------------------------------------------------' | notify -silent -provider-config provider-config.yaml", shell=True)
@@ -207,8 +228,8 @@ def process_assets():
 
         subprocess.run("echo '----------Full Subdomains List----------------' | notify -silent -provider-config provider-config.yaml", shell=True)
 
-        # Notify about subdomain data
-        subprocess.run("cat results/subdomain_fulldb.txt | notify -silent -provider-config provider-config.yaml", shell=True)
+        # Notify about aws subdomain data via route53
+        subprocess.run("cat final_results/subdomain_fulldb.txt | notify -silent -provider-config provider-config.yaml", shell=True)
 
         subprocess.run("echo '-----------------------------------------------------------------------------------------------------' | notify -silent -provider-config provider-config.yaml", shell=True)
         subprocess.run("echo -n '------------------------------------------------------------------------------------------------------' | notify -silent -provider-config provider-config.yaml", shell=True)
@@ -227,11 +248,11 @@ def run_nuclei_full_scan():
         subprocess.run("echo '------------------------Starting Nuclei Full Scan-------------------------------------------------' | notify -silent -provider-config provider-config.yaml", shell=True)
 
         # Perform Nuclei full scan
-        #currently set to http in template to reduce the time, in reality run_nuclei_aws_scan scans only for http however full scan uses all the templates including http
-        subprocess.run("cat results/subdomain_fulldb.txt | httpx -silent | nuclei -t nuclei-templates/http/ -silent -o results/subdomain_fullscan.txt", shell=True)
+        #currently set to http in template to reduce the time, in reality run_nuclei_aws_scan scans for domains - cname & a record from route53, this includes all
+        subprocess.run("cat final_results/subdomain_fulldb.txt | httpx -silent | nuclei -t nuclei-templates/http/ -silent -o final_results/subdomain_fullscan.txt", shell=True)
 
         # Notify about subdomain full scan
-        subprocess.run("cat results/subdomain_fullscan.txt | notify -silent -bulk -provider-config provider-config.yaml", shell=True)
+        subprocess.run("cat final_results/subdomain_fullscan.txt | notify -silent -bulk -provider-config provider-config.yaml", shell=True)
 
         # Notify separator line
         subprocess.run("echo '-----------------------------------------------------------------------------------------------------' | notify -silent -provider-config provider-config.yaml", shell=True)
@@ -243,16 +264,16 @@ def run_nuclei_full_scan():
             error_log.write(str(error))
         raise error
 
-# Function to run Nuclei aws public endpoint check
+# Function to run Nuclei aws route53 public endpoint check
 def run_nuclei_aws_scan():
     try:
         subprocess.run("echo '------------------------Starting Nuclei AWS Public Endpoint Scan-------------------------------------------------' | notify -silent -provider-config provider-config.yaml", shell=True)
 
         # Perform Nuclei full scan
-        subprocess.run("cat results/subdomain_fulldb.txt | httpx -silent | nuclei -t nuclei-templates/http/ -silent -o results/aws_services_fulldb_scan.txt", shell=True)
+        subprocess.run("cat final_results/route53_subdomains.txt | httpx -silent | nuclei -t nuclei-templates/http/ -silent -o final_results/aws_services_fulldb_scan.txt", shell=True)
 
         # Notify about subdomain full scan
-        subprocess.run("cat results/aws_services_fulldb_scan.txt | notify -silent -bulk -provider-config provider-config.yaml", shell=True)
+        subprocess.run("cat final_results/aws_services_fulldb_scan.txt | notify -silent -bulk -provider-config provider-config.yaml", shell=True)
 
         # Notify separator line
         subprocess.run("echo '-----------------------------------------------------------------------------------------------------' | notify -silent -provider-config provider-config.yaml", shell=True)
