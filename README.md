@@ -23,6 +23,12 @@
     - You have a bash shell available to run scripts
     - Slack webhook configured for alerts.
     - awscli installed & configured with relevant permission to fetch the records from route53.
+- Install below mentioned tools and make sure tools are working via cli.
+   ```
+    - httpx: go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
+    - xx
+
+   ```
 
 ## Installation
 
