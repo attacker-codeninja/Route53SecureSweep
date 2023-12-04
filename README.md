@@ -12,6 +12,13 @@
     - Python 3.10 or higher installed
     - pip and venv modules for Python
     - Go programming language installed
+        ```
+        export GOPATH=$HOME/go
+        export GOROOT=/usr/local/go
+        export GOBIN=$GOPATH/bin
+        export PATH=$PATH:$GOPATH
+        export PATH=$PATH:$GOROOT/bin
+        ```
     - git installed for cloning repositories
     - You have a bash shell available to run scripts
     - Slack webhook configured for alerts.
