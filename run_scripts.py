@@ -254,7 +254,7 @@ def run_nuclei_full_scan():
 
         # Perform Nuclei full scan
         #currently set to http in template to reduce the time, in reality run_nuclei_aws_scan scans for domains - cname & a record from route53, this includes all
-        subprocess.run("cat final_results/subdomain_fulldb.txt | httpx -silent | nuclei -t nuclei-templates/http/ -silent -o final_results/subdomain_fullscan.txt", shell=True)
+        subprocess.run("cat final_results/subdomain_fulldb.txt | httpx -silent -ports 1-10000 -t 1000 -rate-limit 500 | nuclei -t nuclei-templates/http/ -silent -o final_results/subdomain_fullscan.txt", shell=True)
 
         # Notify about subdomain full scan
         subprocess.run("cat final_results/subdomain_fullscan.txt | notify -silent -bulk -provider-config provider-config.yaml", shell=True)
@@ -275,7 +275,7 @@ def run_nuclei_aws_scan():
         subprocess.run("echo '------------------------Starting Nuclei AWS Public Endpoint Scan-------------------------------------------------' | notify -silent -provider-config provider-config.yaml", shell=True)
 
         # Perform Nuclei full scan
-        subprocess.run("cat final_results/route53_subdomains.txt | httpx -silent | nuclei -t nuclei-templates/http/ -silent -o final_results/aws_services_fulldb_scan.txt", shell=True)
+        subprocess.run("cat final_results/route53_subdomains.txt | httpx -silent -ports 1-10000 -t 1000 -rate-limit 500 | nuclei -t nuclei-templates/http/ -silent -o final_results/aws_services_fulldb_scan.txt", shell=True)
 
         # Notify about subdomain full scan
         subprocess.run("cat final_results/aws_services_fulldb_scan.txt | notify -silent -bulk -provider-config provider-config.yaml", shell=True)
