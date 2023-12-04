@@ -25,9 +25,10 @@
     - awscli installed & configured with relevant permission to fetch the records from route53.
 - Install below mentioned tools and make sure tools are working via cli.
    ```
-    - httpx: go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
-    - notify: go install -v github.com/projectdiscovery/notify/cmd/notify@latest
-    - anew: go install -v github.com/tomnomnom/anew@latest
+    - go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest
+    - go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
+    - go install -v github.com/projectdiscovery/notify/cmd/notify@latest
+    - go install -v github.com/tomnomnom/anew@latest
 
    ```
 
