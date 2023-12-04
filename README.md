@@ -26,7 +26,8 @@
 - Install below mentioned tools and make sure tools are working via cli.
    ```
     - httpx: go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
-    - xx
+    - notify: go install -v github.com/projectdiscovery/notify/cmd/notify@latest
+    - anew: go install -v github.com/tomnomnom/anew@latest
 
    ```
 
