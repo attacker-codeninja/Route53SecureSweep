@@ -125,11 +125,11 @@ def clone_templates_repo():
 def update_templates_repo():
     try:
         print("🔄 Updating the nuclei-templates repository...")
-        subprocess.run(["git", "-C", TEMPLATES_REPO_DIR, "fetch", "--all"])
-        subprocess.run(["git", "-C", TEMPLATES_REPO_DIR, "reset", "--hard", "origin/master"])
+        subprocess.run(["git", "pull", "--ff-only"], cwd=TEMPLATES_REPO_DIR)
         print("✅ Update completed successfully.")
     except subprocess.CalledProcessError as e:
         raise Exception(f"❌ An error occurred while updating the nuclei-templates repository: {str(e)}")
+
 
 
 # Function to run additional scripts
