@@ -177,9 +177,9 @@ def run_additional_scripts():
 # Function to run Nuclei subdomain check
 def run_nuclei_subdomain_check():
     try:
-        run_nuclei_scan = "cat route53_results/sorted_route53_subdomains.txt | httpx -silent | nuclei -t nuclei-templates/http/takeovers -silent -o final_results/subdomain_takeover.txt"
+        run_nuclei_scan = "cat route53_results/sorted_route53_subdomains.txt | httpx -silent -ports 1-10000 -t 1000 -rate-limit 500 | nuclei -t nuclei-templates/http/takeovers -silent -o final_results/subdomain_takeover.txt"
         os.system(run_nuclei_scan)
-        subprocess.run("cat route53_results/sorted_route53_subdomains.txt | httpx -silent > final_results/route53_subdomains.txt", shell=True, capture_output=True, text=True)
+        subprocess.run("cat route53_results/sorted_route53_subdomains.txt | httpx -silent -ports 1-10000 -t 1000 -rate-limit 500 > final_results/route53_subdomains.txt", shell=True, capture_output=True, text=True)
 
     except Exception as error:
         with open("error/r53_error_log.txt", "a") as error_log:
