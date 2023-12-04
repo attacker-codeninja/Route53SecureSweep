@@ -34,11 +34,12 @@ else:
 def check_go_installed():
     try:
         subprocess.run(["go", "version"], check=True, capture_output=True)
-        print("Go is installed and working.")
+        print("✅ Go is installed and operational.")
     except FileNotFoundError:
-        raise Exception("Go is not installed. Please install Go and try again.")
+        raise Exception("❌ Go is not detected. Please install Go and retry.")
     except subprocess.CalledProcessError:
-        raise Exception("Go is installed but not working. Please check the installation and try again.")
+        raise Exception("❌ Go is installed but not functioning correctly. Please verify the installation and retry.")
+
 
 
 # Function to check if Nuclei is installed and working
