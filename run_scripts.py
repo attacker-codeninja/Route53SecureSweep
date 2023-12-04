@@ -47,13 +47,14 @@ def check_nuclei_installed():
     try:
         completed_process = subprocess.run(["nuclei", "-version"], check=True, capture_output=True, text=True)
         if "Nuclei Engine Version" in str(completed_process):
-            print("Nuclei is installed and working.")
+            print("✔️ Nuclei is successfully installed and operational.")
         else:
-            raise Exception("Nuclei is installed but not working properly.")
+            raise Exception("❌ Nuclei is installed but not functioning correctly.")
     except FileNotFoundError:
-        raise Exception("Nuclei is not installed. Please install Nuclei and try again.")
+        raise Exception("❌ Nuclei is not installed. Please install Nuclei and try again.")
     except subprocess.CalledProcessError:
-        raise Exception("Nuclei is installed but not working. Please check the installation and try again.")
+        raise Exception("❌ Nuclei is installed but encountering issues. Please verify the installation and try again.")
+
 
 
 # Function to check if Anew is installed and working
@@ -61,24 +62,26 @@ def check_anew_installed():
     try:
         result = subprocess.run(["anew", "-h"], check=True, capture_output=True, text=True)
         if "Usage of anew" in str(result):
-            print("Anew is installed and working.")
+            print("✔️ Anew is successfully installed and operational.")
         else:
-            raise Exception("Anew is installed but not working. Please check the installation and try again.")
+            raise Exception("❌ Anew is installed but not functioning correctly. Please verify the installation and try again.")
     except FileNotFoundError:
-        raise Exception("Anew is not installed. Please install anew and try again.")
+        raise Exception("❌ Anew is not found. Please install Anew to proceed.")
     except subprocess.CalledProcessError:
-        raise Exception("An error occurred while checking the status of anew.")
+        raise Exception("❌ An error occurred while checking the status of Anew.")
+
 
 
 # Function to check if Notify is installed and working
 def check_notify_installed():
     try:
         subprocess.run(["notify", "-version"], check=True, capture_output=True)
-        print("Notify is installed and working.")
+        print("✔️ Notify is successfully installed and operational.")
     except FileNotFoundError:
-        raise Exception("Notify is not installed. Please install Notify and try again.")
+        raise Exception("❌ Notify is not installed. Please install Notify to proceed.")
     except subprocess.CalledProcessError:
-        raise Exception("Notify is installed but not working. Please check the installation and try again.")
+        raise Exception("❌ Notify is installed but encountering issues. Please verify the installation and try again.")
+
 
 
 # Function to check if Httpx is installed and working
@@ -86,27 +89,13 @@ def check_httpx_installed():
     try:
         result = subprocess.run(["httpx", "-version"], check=True, capture_output=True, text=True)
         if "Current Version" in str(result):
-            print("Httpx is installed and working.")
+            print("✔️ Httpx is successfully installed and operational.")
         else:
-            raise Exception("Httpx is installed but not working. Please check the installation and try again.")
+            raise Exception("❌ Httpx is installed but not functioning correctly. Please verify the installation and try again.")
     except FileNotFoundError:
-        raise Exception("Httpx is not installed. Please install Httpx and try again.")
+        raise Exception("❌ Httpx is not installed. Please install Httpx to proceed.")
     except subprocess.CalledProcessError:
-        raise Exception("An error occurred while checking the status of Httpx.")
-
-
-# Function to clone the nuclei templates repository
-def clone_templates_repo():
-    # Check if the templates repository directory exists
-    if os.path.exists(TEMPLATES_REPO_DIR):
-        shutil.rmtree(TEMPLATES_REPO_DIR)
-
-    try:
-        print("Cloning nuclei-templates repository...")
-        subprocess.run(["git", "clone", TEMPLATES_REPO_URL])
-        print("Cloning completed successfully.")
-    except subprocess.CalledProcessError as e:
-        raise Exception(f"Error occurred while cloning nuclei-templates repository: {str(e)}")
+        raise Exception("❌ An error occurred while checking the status of Httpx.")
 
 
 # Function to check if the nuclei templates repository exists and clone it if not
@@ -115,7 +104,32 @@ def check_templates_repo():
     if not os.path.exists(TEMPLATES_REPO_DIR):
         clone_templates_repo()
     else:
-        print("nuclei-templates repository already exists. Skipping cloning.")
+        print("Checking for updates in nuclei-templates repository...")
+        update_templates_repo()
+        
+
+# Function to clone the nuclei templates repository
+def clone_templates_repo():
+    # Check if the templates repository directory exists
+    if os.path.exists(TEMPLATES_REPO_DIR):
+        shutil.rmtree(TEMPLATES_REPO_DIR)
+
+    try:
+        print("🔍 Cloning the nuclei-templates repository...")
+        subprocess.run(["git", "clone", TEMPLATES_REPO_URL])
+        print("✅ Cloning completed successfully.")
+    except subprocess.CalledProcessError as e:
+        raise Exception(f"❌ An error occurred while cloning the nuclei-templates repository: {str(e)}")
+
+# Check for updates
+def update_templates_repo():
+    try:
+        print("🔄 Updating the nuclei-templates repository...")
+        subprocess.run(["git", "-C", TEMPLATES_REPO_DIR, "fetch", "--all"])
+        subprocess.run(["git", "-C", TEMPLATES_REPO_DIR, "reset", "--hard", "origin/master"])
+        print("✅ Update completed successfully.")
+    except subprocess.CalledProcessError as e:
+        raise Exception(f"❌ An error occurred while updating the nuclei-templates repository: {str(e)}")
 
 
 # Function to run additional scripts
@@ -157,7 +171,7 @@ def run_additional_scripts():
         # Execute redshift.sh
         subprocess.run(['bash', 'checks/redshift.sh'])
     except subprocess.CalledProcessError as e:
-        raise Exception(f"Error occurred while running additional scripts: {str(e)}")
+        raise Exception(f"An error occurred during the execution of supplementary scripts: {str(e)}")
 
 
 # Function to run Nuclei subdomain check
