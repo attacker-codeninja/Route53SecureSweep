@@ -307,8 +307,7 @@ def run_nuclei_aws_scan():
 
 # Function to run the necessary scripts
 def run_scripts():
-    os.environ['GOPATH'] = '$HOME/go'
-    os.environ['PATH'] = '$PATH:/usr/local/go/bin:$GOPATH/bin'
+
     # Check if 'results' folder exists and delete it if present
     if os.path.exists("results"):
         shutil.rmtree("results")
