@@ -418,5 +418,24 @@ def run_scripts():
 
 
 # Call the function to run the scripts
+# Define the banner text with the "Route53Sweep" ASCII art
+BANNER = """
+______                _          _____  _____  _____                              
+| ___ \              | |        |  ___||____ |/  ___|                             
+| |_/ /  ___   _   _ | |_   ___ |___ \     / /\ `--. __      __  ___   ___  _ __  
+|    /  / _ \ | | | || __| / _ \    \ \    \ \ `--. \\ \ /\ / / / _ \ / _ \| '_ \ 
+| |\ \ | (_) || |_| || |_ |  __//\__/ /.___/ //\__/ / \ V  V / |  __/|  __/| |_) |
+\_| \_| \___/  \__,_| \__| \___|\____/ \____/ \____/   \_/\_/   \___| \___|| .__/ 
+                                                                           | |    
+                                                                           |_|    
+
+Route53Sweep - Created by infosecblossom & justmorpheus
+"""
+
+
+# Call the function to run the scripts
 if __name__ == "__main__":
+    # Print the updated banner before running the scripts
+    print(BANNER)
     run_scripts()
+
